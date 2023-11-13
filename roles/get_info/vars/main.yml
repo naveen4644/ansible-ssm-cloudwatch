@@ -1,0 +1,5 @@
+---
+aws_region: us-west-2
+hostpath: "./inventory.ini"
+hoststring: "ansible_ssh_user=ec2-user ansible_ssh_private_key_file=./aws-private.pem"
+hoststring_ssh_verification: "ansible_ssh_extra_args='-o StrictHostKeyChecking=no'"

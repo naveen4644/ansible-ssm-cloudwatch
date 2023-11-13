@@ -1,0 +1,23 @@
+- name: Run the equivalent of "yum update" as a separate step
+  become: yes
+  yum:
+   name: '*'
+   state: latest
+  #  use_backend: dbf
+  register: yum_update_result
+
+- name: Download SSM Agent RPM
+  get_url:
+    url: "https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm"
+    dest: "/tmp/amazon-ssm-agent.rpm"
+
+- name: Install SSM Agent
+  yum:
+    name: "/tmp/amazon-ssm-agent.rpm"
+    state: present
+
+- name: Start and enable SSM Agent service
+  systemd:
+    name: amazon-ssm-agent
+    state: started
+    enabled: yes

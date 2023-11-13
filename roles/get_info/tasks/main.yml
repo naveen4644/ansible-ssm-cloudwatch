@@ -1,0 +1,21 @@
+- name: Get information 
+  ec2_instance_info:
+    region: "{{ aws_region }}"
+    filters:
+       instance-state-name: [ "running"]
+  register: ec2_info
+
+- name: Print EC2 IP address
+  set_fact:
+    public_ips: "{{ ec2_info.instances | map(attribute='public_ip_address') | list }}"
+  when: ec2_info.instances | length > 0
+  register: ec2_ip_list
+
+- name: Add the newly created EC2 instance(s) to host group
+  lineinfile: dest={{ hostpath }}
+              regexp={{ item }} 
+              insertafter="[webserver]" 
+              line="{{ item }} {{hoststring}} {{hoststring_ssh_verification}}"
+              state=present
+  # with_items: "{{ec2.instances}}"
+  with_items: "{{ public_ips }}"
