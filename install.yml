@@ -2,10 +2,7 @@
   hosts: localhost
   roles:
     - role: get_info
-  # tasks:
-  #   - name: Delay between Task 1 and Task 2
-  #     pause:
-  #       seconds: 5 
+
 
 
 - name: SSM Installation

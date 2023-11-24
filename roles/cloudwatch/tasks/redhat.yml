@@ -1,25 +1,28 @@
 ---
-- name: Download CloudWatch Agent RPM
+- name: Download CloudWatch Agent for redhat
   get_url:
     url: "https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm"
     dest: "/tmp/amazon-cloudwatch-agent.rpm"
   when: ansible_os_family == 'RedHat'
 
-- name: Install CloudWatch Agent
+- name: Install CloudWatch Agent for redhat
+  become: true
+  become_method: sudo 
   yum:
     name: "/tmp/amazon-cloudwatch-agent.rpm"
     state: present
   when: ansible_os_family == 'RedHat'
 
-- name: Configure CloudWatch Agent
+- name: Configure CloudWatch Agent for redhat
+  become: true
   template:
     src: cloudwatch-config.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
   notify:
     - Restart CloudWatch Agent
-  when: ansible_os_family == 'RedHat'
 
-- name: Start and enable CloudWatch Agent service
+- name: Start and enable CloudWatch Agent service for redhat
+  become: true
   systemd:
     name: amazon-cloudwatch-agent
     state: started

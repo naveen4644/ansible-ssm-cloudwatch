@@ -1,32 +1,34 @@
 ---
-- name: Download CloudWatch Agent RPM
+- name: Download CloudWatch Agent for ubuntu
   get_url:
     url: "https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb"
     dest: "/tmp/amazon-cloudwatch-agent.deb"
   when: ansible_os_family == 'Debian'  
 
-- name: Install CloudWatch Agent
-  yum:
-    name: "/tmp/amazon-cloudwatch-agent.deb"
+- name: Install CloudWatch Agent for ubuntu
+  become: true
+  apt:
+    deb: "/tmp/amazon-cloudwatch-agent.deb"
     state: present
   when: ansible_os_family == 'Debian'
 
-- name: Configure CloudWatch Agent
+- name: Configure CloudWatch Agent for ubuntu
+  become: true
   template:
     src: cloudwatch-config.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
   notify:
     - Restart CloudWatch Agent
-  when: ansible_os_family == 'Debian'
 
-- name: Start and enable CloudWatch Agent service
+
+- name: Start and enable CloudWatch Agent service for ubuntu
+  become: true
   systemd:
     name: amazon-cloudwatch-agent
     state: started
     enabled: yes
-  when: ansible_os_family == 'Debian'
+
 
 - name: Delay after CloudWatch Agent configuration
   pause:
     seconds: 5
-  when: ansible_os_family == 'Debian'

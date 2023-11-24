@@ -1,5 +1,5 @@
 - name: Run the equivalent of "yum update" as a separate step
-  become: yes
+  become: true
   yum:
    name: '*'
    state: latest
@@ -16,7 +16,7 @@
 
 
 - name: Start and enable SSM Agent service
-  become: yes
+  become: true
   systemd:
     name: amazon-ssm-agent
     state: started
