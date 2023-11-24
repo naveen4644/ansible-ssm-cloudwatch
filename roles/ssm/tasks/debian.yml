@@ -1,0 +1,26 @@
+- name: Run the equivalent of "apt update" as a separate step
+  become: yes
+  ansible.builtin.apt:
+      update_cache: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install snapd package
+  apt:
+    name: snapd
+    state: present
+  become: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install SSM Agent via Snap
+  shell: snap install amazon-ssm-agent --classic
+  become: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Register to service
+  become: yes
+  become_user: root
+  service:
+    name: snap.amazon-ssm-agent.amazon-ssm-agent
+    enabled: yes
+    state: started
+  when: ansible_os_family == 'Debian'

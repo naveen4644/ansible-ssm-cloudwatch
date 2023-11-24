@@ -1,0 +1,24 @@
+- name: Run the equivalent of "yum update" as a separate step
+  become: yes
+  yum:
+   name: '*'
+   state: latest
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Install the AWS SSM Agent (RedHat - dnf)
+  dnf:
+    name: https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+    disable_gpg_check: true
+    state: present
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Start and enable SSM Agent service
+  become: yes
+  systemd:
+    name: amazon-ssm-agent
+    state: started
+    enabled: yes
+  when: ansible_os_family == 'RedHat'
