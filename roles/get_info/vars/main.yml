@@ -1,5 +1,5 @@
 ---
-aws_region: us-west-2
+aws_region: us-east-1
 hostpath: "./inventory.ini"
 user_redhat: "ansible_ssh_user=ec2-user"
 user_ubuntu: "ansible_ssh_user=ubuntu"

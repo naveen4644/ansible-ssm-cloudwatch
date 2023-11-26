@@ -1,0 +1,8 @@
+---
+cwa_package: amazon-cloudwatch-agent
+cwa_temp_path: /tmp
+cwa_global_downloads_timeout: 240
+cwa_install_path: /opt/aws/amazon-cloudwatch-agent
+cwa_agent_config_file: "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.json"
+cwa_package_url: https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+cwa_package_signature: https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm.sig

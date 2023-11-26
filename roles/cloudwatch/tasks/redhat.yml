@@ -1,15 +1,37 @@
 ---
-- name: Download CloudWatch Agent for redhat
+- name: Download {{ cwa_package }}.rpm.sig file
   get_url:
-    url: "https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm"
-    dest: "/tmp/amazon-cloudwatch-agent.rpm"
+    url: "{{ cwa_package_signature }}"
+    dest: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm.sig"
+    timeout: "{{ cwa_global_downloads_timeout }}"
   when: ansible_os_family == 'RedHat'
+  
+- name: Download {{ cwa_package }}.rpm file
+  get_url:
+    url: "{{ cwa_package_url }}"
+    dest: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm"
+    timeout: "{{ cwa_global_downloads_timeout }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Verify {{ cwa_package }} package signature
+  command: gpg --verify {{ cwa_package }}.rpm.sig {{ cwa_package }}.rpm
+  register: verified_sig
+  failed_when: "'BAD' in verified_sig.stderr"
+  changed_when: false
+  args:
+    chdir: "{{ cwa_temp_path }}"
+
+# - name: Download CloudWatch Agent for redhat
+#   get_url:
+#     url: "https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm"
+#     dest: "/tmp/amazon-cloudwatch-agent.rpm"
+#   when: ansible_os_family == 'RedHat'
 
 - name: Install CloudWatch Agent for redhat
   become: true
   become_method: sudo 
   yum:
-    name: "/tmp/amazon-cloudwatch-agent.rpm"
+    name: "{{ cwa_temp_path }}/amazon-cloudwatch-agent.rpm"
     state: present
   when: ansible_os_family == 'RedHat'
 
@@ -17,14 +39,14 @@
   become: true
   template:
     src: cloudwatch-config.json.j2
-    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    dest: "{{ cwa_agent_config_file }}"
   notify:
     - Restart CloudWatch Agent
 
 - name: Start and enable CloudWatch Agent service for redhat
   become: true
   systemd:
-    name: amazon-cloudwatch-agent
+    name: "{{ cwa_package }}"
     state: started
     enabled: yes
   when: ansible_os_family == 'RedHat'
